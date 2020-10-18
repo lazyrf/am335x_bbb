@@ -1,5 +1,8 @@
 # am335x_bbb
 
+## Function Block Diagram
+![am335x_block_diagram](imgs/am335x_block_diagram.png)
+
 ## Linux Boot Requirements
 What do we need to successfully boot Linux on the hardware such as Beaglebone Black?
 
@@ -12,6 +15,7 @@ What do we need to successfully boot Linux on the hardware such as Beaglebone Bl
     * SPL stands for "Second Program Loader"
     * MLO stands for "Memory LOader"
     * The job of the Second stage boot loader is to load and execute the third stage boot loader such as U-boot
+    * MLO = SPL + Header. This header will tell you the internal RAM adress at which the SPL is going to get transferred.
 3. U-boot (Runs out of DDR)
     * The job of the third stage boot loader is to load and run the Linux kernel
 4. Linux Kernel (Runs out of DDR)
@@ -1240,3 +1244,600 @@ nameserver 8.8.4.4
 * Host side
 1. Enable ip fordwarding
 `echo 1 > /proc/sys/net/ipv4/ip_forward`
+
+## Linux Device Tree (Flattened Device Tree)
+* The on-board pheripherals which connect to SPI, I2C, SDIO, Ethernet, etc. have no capability to announce there existence on the board by themselves to the operating system. These peripherals are also called as **Platform devices**.
+* Becasue, those interfaces like I2C, SPI, SDIO, etc., they don't have intelligence to support dynamic discoverability.
+* **USB device has the inbuilt intelligence to send its details to the operating system. (That means USB support dynamic discoverability)**
+
+*How can we make Linux kernel know about these platform devices?*
+
+That is hard coding these platform device details in a file called the board file.
+
+```
+/* my-board-config.c */
+static void my_board_init(void)
+{
+    /* Serial */
+    my_board_add_device_serial(&serial_data);
+    /* SPI */
+    my_board_add_device_spi(&zigbee_data);
+    my_board_add_device_spi(&serialflash_data);
+    /* Ethernet */
+    my_board_add_device_eth(&eth_data);
+    /* I2C */
+    my_board_add_device_i2c(&eeprom_data);
+    /* LEDs */
+    my_board_add_device_gpios(&leds_data);
+
+    ...
+}
+```
+
+* my-board-config.c contains the function called "my_board_init", which manually adds all the platform devices to the linux subsystem along with the coressponding platform data.
+* Whenever you modifty the board file to add a new device entry, you have to re-compile the kernel.
+* When a driver for a particular platform peripheral is loaded, the Linux calls the **probe** function of the driver if there is any match in its platform device database. In the probe function of the driver, you can do device initializations.
+
+### Why Device Treee is introduced?
+![board_file_example](imgs/board_file_example.png)
+* **For each board, you'll be having separate kernel image. So, this is a problem which the Linux community wanted to solve.**
+* The Linux community wanted ot cut off the dependencies of platform device enumeration from the Linux kernel, that is, hard coding of platform device specific details into the Linux kernel.
+* So, then ARM community came up with this idea called **Device Tree** also called as **Flattend Device Tree Model**.
+
+![board_dtb](imgs/board_dtb.png)
+
+#### **Devie Tree Source File (DTS)**
+* Instead of adding hard coded hardware details into the Linux kernel board file, every board vendors has to come up with a file called DTS.
+* This file actually consists of all the details related to the board written using some pre defined syntaxs. So you can say that this file consists of data structures which describe all the required peripherals of the board.
+* This file will be compiled using a Device Tree Compiler (dtc). dtc convert DTS file to the stream of bytes, that is a binary. We call this binary as DTB.
+* **When you edit the DTS file to add a new entry, you need not to compile the kernel again, you just have to compile the DTS to obtain the new DTB.**
+* **So, when the kernel boots, you should tell the kernel where this DTB reside in the memory, so that the Linux kernel can load that DTB file and extract all the hardware details of the board.**
+
+![linux_load_dtb](imgs/linux_load_dtb.png)
+
+**DTS file is lcoated at arch/arm/boot/dts folder.**
+
+## uEnv.txt and initramfs
+* uEnv.txt file is nothing but collections of various env variables which are initailized to number of uboot command and automating the command execution.
+* U-boot always try to read the uEnv.txt from the boot source, if uEnv.txt not found, it will use the default values of the env variables.
+* If you don't want u-boot to use default values, enforce new vlaues using uEnv.txt
+* **boot* command of the u-boot does nothing but running of an env variable called "bootcmd". So, if you want to change the behavior of **boot**, you have to change commands stored in the env variable "bootcmd"
+
+
+### Lets load the Linux binary image "uImage" from the second partition of the on-board eMMC memory into the DDR memory
+1. Load the linux kernl image to the DDR memory
+    * `load mmc 0:2 0x82000000 /boot/uImage`
+2. Load the DTB image to the DDR memory
+    * `load mmc 0:2 0x88000000 /boot/am335x-boneblack.dtb`
+3. Send **bootargs** to the linux kernel from u-boot.
+    * `setenv bootargs console=ttyO0,115200 root=/dev/mmcblk0p2 rw`
+4. Boot from memory
+    * `bootm 0x82000000 - 0x88000000`
+
+uEnv.txt
+
+```
+myip=setenv serverip 192.168.1.2
+ipaddr=192.168.1.1
+bootargs=setenv bootargs console=ttyO0,115200 root=/dev/mmcblk0p2 rw
+bootcmd=echo "----------Booting from memory----------";load mmc 0:2 0x82000000 /boot/uImage;load mmc 0:2 0x88000000 /boot/am335x-boneblack.dtb;bootm 0x82000000 - 0x88000000;
+
+```
+
+
+### U-boot's serial port transfer protocols command
+command|details
+---|---
+loadx|Send/receive file using xmodem protocl
+loady|Send/receive file using ymodem protocl
+loadz|Send/receive file using zmodem protocl
+
+`env import -t <memory addr> <size in bytes>` to load uEnv.txt
+
+
+## RFS (Root File System)
+* The root file system, as the name indicates, it's a file system which Linux mounts to the / (root).
+* File system is nothing but a collection of files organized in standard folder structure. That is called **File System Hierachy Standard**.
+    * https://wiki.Linuxfoundation.org/lsb/fhs-30
+    * https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard#cite_note-2
+    * https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s02.html
+* In a typical file system you will find the below folder structure, even though all these folders are not required for Linux to boot and mount the file systm successfully.
+
+Directory|Description
+---|---
+bin|Essential command binaries
+boot|Static files of the boot loader
+dev|Device files
+etc|Host-specific system configuration
+lib|Essential shared libraries and kernel modules
+media|Mount point for removable media
+mnt|Mount point for mouting a file system temporarily
+opt|Add-on application software packages
+run|Data relevant to running processes
+sbin|Essential system binaries
+srv|Data for services provided by this system
+tmp|Temporary files
+usr|Secondary hierarchy
+var|Variable data
+
+### bin/
+* This directory contians binaries of Linux commands which are used by both the system admins and users.
+* You don't need privileges from your System admin to execute these commands neither you need root access.
+* Remember that this foler will not contain binaries for all the Linux commands. There is a restriction on what types of commands have to be placed in this directory, becasue these binaries can be executed by the common user.
+* Below are some the commands you will find it in the bin directory.
+    * cat, chgrp, chmod, chown, cp, date, dd, df, dmesg, echo, false, hostname, kill, ln, login, ls, mkdir, mknod, more, mount, mv, ps, pwd
+* You can see that commands related to "repairing", "recovering", "restoring", "network configuration", "modules install remove" are not found in this directory
+
+### boot/
+* This directory contains the boot related files, which are required to boot the Linux.
+* **This directory may be read by the bootloadr to read the boot images like Linux kernel image, dtb, vmLinux, initramfs, etc.**
+* So, this directory may be accessed by boot loader even before the kernel boots and mounts the filesystem.
+
+### dev/
+* This is the place where you can find the "device files".
+* You may be heard or read this statement **in unix/Linux devices are treated like file access**
+* Yes, if you want to access any I/O, networking devices, memory devices, serial devices, parallel devices, input output devices such as keyboard, mouse, display, everything will be treated like a file
+* The i2c devices may have a file entries like this
+    * **/dev/i2c-0**
+    * **/dev/i2c-1**
+* The ram may have a device file entry like **/dev/ram0**
+* The 2 partition of the SD card may have entries like this:
+    * **/dev/mmcblk0p1**
+    * **/dev/mmcblk0p2**
+* The serial devices may have entries like this:
+    * **/dev/ttyS0**
+    * **/dev/ttyS1**
+    * **/dev/ttyO0**
+* It's the responsibility of the respective drirvers to populate this directory with the device files.
+
+### etc/
+* This is the place where all the start-up scripts, networking scripts, scripts to start and stop networking protocols like NFS, networking configuration files, different run level scripts will be stored.
+    1. Contains run level scripts, which will be used during different run levels
+    2. Contains start-up and shutdown scripts
+    3. Contains various scripts related to services like start/stop networking, start/stop NFS, etc.
+    4. Contains various configuration fils, like passwd, hostinfo, etc.
+    5. Contains various network configuration files
+
+### lib/
+* The major contents of this directory are
+    1. The dynamically loadable kernel module.
+    2. To store the Essential shared libraries (.so) for dynamic linking. For example, 'C' shared library (libc), math library, python library, etc.
+
+### media/
+* This is the mount point for the removable media like your USB flash drive, SD cards, camera, cell phone memory, etc.
+* For example, when i connect my SD card to the PC, there will be 2 devices files will be created for each partition **/dev/sdb1** and **/dev/sdb2**. These 2 device files are automatically mounted under the **/media** directory. So that i can access those 2 partitions just like folders.
+
+### mnt/
+* This is the place where you can mount the temporary file system.
+* The system admins can use a Linux commands to temporarily mount and un-mount the file system, if they want to transfter any file.
+
+### opt/
+* opt stands for "optional"
+* This directory will be used when you install any software packages for your Linux distrution
+* For example, if i run the command apt-get install <some packages name> then package will be installed in this directory.
+
+### sbin/
+* sbin may be stands for "System admin's bin"
+* This commands which come in the category of system administration will be stored in this directory, which is used by your system admins for the purpose of networking configurations, repairing, restoring and recovering.
+* It also has root only command and need privileges to execute those commands.
+    * fastboot, fasthalt, fdisk, fsck, fsck.*, getty, hat, ifconfig, init, mkfs, mkfs.*, mkswap, reboot, route, swapon, swapoff, update.
+
+### home/
+* The /home directory contains a home folder for each user
+* Each user only has write access to their own home folder and msut obtain elevated permissions (become the root user) to modify other files on the system.
+* This directory will be used to store personal data of the user.
+
+### srv/
+* srv stands for "service"
+* The /srv directory contains "data for services provide by the system". If you are using the Apache HTTP server to service a website, you'd likely store your website's files in a directory inside the /srv directory.
+
+### tmp/
+* Applications store temporary files in the /tmp directory
+
+### usr/
+* According to FHS, it's a "secondary hierarchy", the usr/ directory may contain the below sub directories.
+
+Directory|Description
+bin|Most user commands
+include|Header files included by C programs
+lib|Libraries
+local|Local hierarchy (empty after main installation)
+sbin|Non-vital system binaries
+share|Architecture-independent data
+
+* **/usr/bin** contains binary of the commands for user programs.
+* For example, if you have firefox on your system then just check it must be available under **/usr/bin** not under **/bin**. Because it is a binary related to user installed programs, similarly, zip command also will find it under /usr/bin.
+* **/usr/sbin** contains, again privileged commands which may be used by the system admins, but these commands are for system administration purposes.
+* **/usr/include** will hold the header files which will be included from the C programs you write.
+* **/usr/lib** will again hold the shared libraries, linker/loader files, which enable your /usr/bin and /usr/sbin command to execute.
+
+https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03.html
+
+## initramfs
+### What is initramfs?
+The word "initramfs" is made up of three words "initial" "RAM" based "filesystem".
+
+This is nothing but a file system hierarchy, made to live in the RAM of the device by compressing it (we use compression because RAM is precious, we cannot use whole RAM just to store the FS) and during booting, Linux mounts this file system as the initial filesystem. That means you just need RAM to mount the FS and get going with the complete boot process.
+
+### Does that mean usage of initramfs is compulsory? Used everywhere, every time?
+No, not necessarily. Using initramfs is optional.
+
+### So, why do we need initramfs?
+Let's say you have a product and your produt has USB interfaces, mass storage device like SD card and let's say you also have networking peripherals like Ethernet and also display.
+
+Now, to operate this wide range of peripherals, all the device drivers must be in place right?
+
+That means all the drivers must be loaded into the kernel space.
+
+And along with the drivers, some peripherals may require the firmware binaries to operate.
+
+One idea is make surce that all those drivers are "built in" in to the kernel, that's not a great idea beacause that makes your Linux kernel specific to your product and it will drastically increase the Linux kernel image size.
+
+Another good way is, you come up with the minimal file system, where you store all your drivers and firmware, and load that FS into the RAM and ask the Linux to mount that file system during boot (Thanks to kernel boot arguments, you can use the kernel boot arguments to indicate kernel that your FS reside in RAM).
+
+When the kernel mounts that file system from RAM, it loads all the required drivers for your product and all the peripherals of your product are ready to operate, because the drivers are in place.
+
+After that you can even get rid of this RAM based file system and use (switch to) some other advanced filesystem which resides on your other memory device like eMMC/SD card or even you can mount from the network.
+
+So, basically initramfs embedded into the kernel and loaded at an early stage of the boot process, where it gives all the minimal requirements to boot the Linux kernel successfully on the board just from RAM with worring about other peripherals. And what you should store in initramfs is left to your product requirements, you may store all the important drivers and firmware, you may keep your product specific scripts, early graphic display logos, etc.
+
+### How to keep initramfs in to RAM?
+There are 2 ways,
+
+1. You can make initramfs "built in" into the Linux kernel during compilation, so, when the Linux starts booting, it will place the initramfs in the RAM and mounts as the initial root file system and continues.
+2. You can load the initramfs from some other sources into the RAM of your board and tell the Linux Kernel about it vai the kernel boot argument.
+
+## Peripheral Booting
+The ROM Code can boot from three different peripheral interfaces:
+* EMAC: 1000/100/10 Mbps Ethernet, using standard TCP/IP network boot protocols BOOTP and TFTP
+* USB: Full speed, client mode
+* UART: 115.2Kbps, 8 bits, no parity, 1 stop bit, no flow control
+
+### Serial booting
+* Serial booting means transferring the boot images from HOST to the board via the serial port (UART) in order to boot the board.
+* We will keep all the boot images like SPL, u-boot, linux kernel image, DTB and the file system on the HOST PC.
+
+#### How serial booting work?
+* First, we have to make our board boots via UART peripheral
+* We have to boot exactily the same way how we used to boot via SD card, that is press and hold the S2 button, then press and release the S3 button, make sure that SD card is NOT inserted to the board.
+* When you keep the board into UART boot mode, the ROM bootloader is waiting for the second stage bootloader that is SPL image over xmodem protocol only.
+* Once the SPL executes it also tries to get the third stage boot loader that is u-boot image over xmodem protocol and you should send the u-boot image over xmodem protocol from the host.
+* When u-boot executes you can use u-boot commands such xmodem or ymodem to load rest of the images like linux image, DTB, initramfs into the DDR memory of the board at recommend address.
+* Recommended load addresses
+
+Binary|DDR RAM load address
+---|---
+Linux Kernel image (uImage)|0x82000000
+FDT or DTB|0x88000000
+ramdisk or initramfs|0x88080000
+
+
+* Kernerl Boot arguments
+    * `setenv bootargs console=ttyO0,115200 root=/dev/ram0 rw initrd=0x88080000`
+* U-boot's boot from memory command
+    * `bootm $(kernel_load_address} ${initramfs_load_address} ${dtb_load_address}`
+    * `bootm 0x82000000 0x88080000 0x88000000`
+
+## TFTP booting
+1. We will keep the primary boot images like SPL, u-boot and uEnv.txt on the SD card
+2. We will keep other boot images like Linux Kernel image, DTB and the initramfs on the linux host PC at the location /varl/lib/tftpboot
+3. After that we first boot the board via sd card up to u-boot
+4. Then u-boot reads the uEnv.txt file and executes the tftp commands to fetch and place the various boot images from tftp servr on to the DDR memory
+5. Then we will ask u-boot to boot from the location where it placed the linux kernel image on the DDR memory
+
+* Configure the "serverip" and "ipaddr" environment variables of the u-boot
+    * `setenv serverip 192.168.7.1`
+    * `setenv ipaddr 192.168.7.2`
+* U-boot TFTP boot command
+    * `tftpboot ${load_address} ${file_name}`
+    * `tftpboot 0x82000000 uImage`
+    * `tftpboot 0x88000000 am335x-boneblack.dtb`
+    * `tftpboot 0x88080000 initramfs`
+* U-boot's boot from memory command
+    * `bootm 0x82000000 0x88080000 0x88000000`
+
+## U-boot
+![spl](imgs/spl.png)
+
+* arch/ - Architecture dependent soruce code, ex. arch/arm
+* board/ - Chip vendor dpendent soruce code, board/ti
+* configs - All config file
+
+1. Delete all the previously compiled/generated object files
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean`
+2. Apply board default configuration for u-boot
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- am335x_boneblack_defconfig`
+3. Run menuconfig if you want to do any settings other than default configuration
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig`
+4. Compile
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4`
+
+```
+  OBJCOPY u-boot-nodtb.bin
+  OBJCOPY u-boot.srec
+  SYM     u-boot.sym
+  COPY    u-boot.bin
+  MKIMAGE u-boot.img
+  LD      spl/drivers/usb/musb-new/built-in.o
+  LD      spl/drivers/built-in.o
+  LD      spl/fs/ext4/built-in.o
+  LD      spl/fs/fat/built-in.o
+  LD      spl/fs/built-in.o
+  LD      spl/u-boot-spl
+  OBJCOPY spl/u-boot-spl-nodtb.bin
+  COPY    spl/u-boot-spl.bin
+  MKIMAGE MLO
+  MKIMAGE MLO.byteswap
+  CFGCHK  u-boot.cfg
+```
+
+
+## Linux Kernel source
+* Linux source
+    * arch
+        * arm
+        * x86
+    * crypto
+    * Documentation
+    * drivers
+        * bus
+        * block
+        * usb
+        * char
+        * mtd
+    * fs
+        * ext2
+        * ext4
+        * fat
+    * mm
+    * include
+        * linux
+        * misc
+        * net
+        * asm-gen
+    * kernel
+        * sched
+        * debug
+        * printk
+        * power
+    * net
+        * atm
+        * blueth
+        * ethernet
+        * can
+    * ipc
+    * lib
+    * ...
+
+### Arch specific code organiation in Linux
+![arch_specific_code](imgs/arch_specific_code.png)
+
+* **arch/** - the processor specific, SOC specific and board specific details.
+
+### Processor (CPU) specific codes go here
+* arch/arm/kernel
+* arch/arm/mm
+* arch/arm/boot/compressed
+* arch/arm/boot/lib
+* arch/arm/boot/dts
+
+### SOC & board specific code go here
+* arch/arm/mach-omap2   - Texas Instruments OMAP2/3/4, AM33xx SOC
+* arch/arm/mach-bcm     - Broadcom
+* arch/arm/mach-alpine  - AlphaScale ASM9260
+* arch/arm/mach-asm9260 - Microchip's (ATMEL) ARM-based SAM9260
+* ...
+
+![mach_soc_board_specifc_code](imgs/mach_soc_board_specific_code.png)
+* The board file is a 'C' source file, which explains the various peripherals on the board (out side the SOC). This file usually contains the registration functions and data of various on board devices, eg. for Ethernet phy, eeprom, leds, lcds, etc. Basically the board vendor uses this board file to register various board peripherals with the Linux subsystem.
+* machine shared common code, contains various 'C' source files which contain the helper functions to initialize and deal with the various on chip peripherals of the SOC and these codes are common among all the SOCs which share common IP for the peripherals.
+![mach_soc_board_specifc_code2](imgs/mach_soc_board_specific_code2.png)
+* Most of the board files are removed and introduced "board-generic" board file which is generic to all the boards which are based on OMAP2 + SOCs. Thanks to DTB.
+* When the Linux detects a particular hardware, then it triggers the appropriate initialzation function.
+
+*How does the Linux detect a particular platform and how it trigger approiate initialization function?*
+
+When the Linux detects your DTB, it will read the field called **dt_compat**. DTB will also has a field called dt_compat. Linux compare DTB's dt_compat field with every machine registration. It a match is found, Linux comes to know that platform and it will trigger all initialization functions.
+
+arch/arm/mach-omap2/board-generic.c
+```
+#ifdef CONFIG_SOC_AM33XX
+static const char *const am33xx_boards_compat[] __initconst = {
+	"ti,am33xx",
+	NULL,
+};
+
+DT_MACHINE_START(AM33XX_DT, "Generic AM33XX (Flattened Device Tree)")
+	.reserve	= omap_reserve,
+	.map_io		= am33xx_map_io,
+	.init_early	= am33xx_init_early,
+	.init_machine	= omap_generic_init,
+	.init_late	= am33xx_init_late,
+	.init_time	= omap3_gptimer_timer_init,
+	.dt_compat	= am33xx_boards_compat,
+	.restart	= am33xx_restart,
+MACHINE_END
+#endif
+```
+
+### SOC specific drvier
+* LCD controller - `drivers/video/fbdev/`
+* Touch screen controller - `drivers/input/touchscreen/ti_tsc.ko`
+* MMC/SD/SDIO cards - `drivers/mmc/host/omap_hsmmc.c`
+* McSPI controller - `drivers/spi/spi-omap2-mcspi.c`
+* I2C controller - `drivers/i2c/busses/i2c-omap.c`
+* NAND/NOR Flash/External SRAM (GPMC) - `drviers/memory/omap-gpmc.c`
+* USB controller - `drivers/usb/musb/musb_core.c`, `drivers/usb/musb/musb_gadget.c`, `drivers/usb/musb/musb_host.c`, `linux/drivers/usb/phy/phy-am335x.c`
+* UART - `drivers/tty/serial/omap-serial.c`
+* Watchdog timer - `drivers/watchdog/omap_wdt.c`
+* RTC - `drivers/rtc/rtc-omap.c`
+
+### Build Linux Kernel
+1. Clean
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- distclean`
+2. Apply the default configuration (arch/arm/configs/bb.org_defconfig)
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bb.org_defconfig`
+3. Change the config
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig`
+    * <*> signifies that the kernel module is compiled along with the kernel (also called static module). That also means that, all the <*> entries will be part of finally generated "uImage", thus increasing size of the "uImage"
+    * <M> signifies that the kernel module is NOT compiled alon with the kernel (also called dynamic loadable module). <M> entries will NOT be part of final generated "uImage".
+```
+CONFIG_USB_NET_CDC_EEM:
+
+This option supports devices conforming to the Communication Device
+Class (CDC) Ethernet Emulation Model, a specification that's easy to
+implement in device firmware.  The CDC EEM specifications are available
+from <http://www.usb.org/>.
+
+This driver creates an interface named "ethX", where X depends on
+what other networking devices you have in use.  However, if the
+IEEE 802 "local assignment" bit is set in the address, a "usbX"
+name is used instead.
+
+Symbol: USB_NET_CDC_EEM [=m]
+Type  : tristate
+Prompt: CDC EEM support
+  Location:
+    -> Device Drivers
+      -> Network device support (NETDEVICES [=y])
+        -> USB Network Adapters (USB_NET_DRIVERS [=y])
+          -> Multi-purpose USB Networking Framework (USB_USBNET [=y])
+  Defined at drivers/net/usb/Kconfig:236
+  Depends on: NETDEVICES [=y] && USB_NET_DRIVERS [=y] && USB_USBNET [=y]
+```
+
+4. Compile
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- uImage dtbs LOADADDR=0x80008000 -j4`
+    * If you don't mention uImage, the kernel will just generate the zImage
+```
+  Kernel: arch/arm/boot/Image is ready
+  Kernel: arch/arm/boot/zImage is ready
+  UIMAGE  arch/arm/boot/uImage
+Image Name:   Linux-4.14.108
+Created:      Sat Oct 17 10:30:22 2020
+Image Type:   ARM Linux Kernel Image (uncompressed)
+Data Size:    9843200 Bytes = 9612.50 KiB = 9.39 MiB
+Load Address: 80008000
+Entry Point:  80008000
+  Kernel: arch/arm/boot/uImage is ready
+```
+
+**The uImage is located at arch/arm/boot.**
+
+5. Compile the dynamically loadable kernel modules (<M> entries)
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 modules`
+6. Intall modules (.ko files) to root file system
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=<path of the RFS> modules_install`
+    * <path of the RFS>/lib/modules/<kernel_version>/module.builtin list out all statically compiled kernel modules.
+    * <path of the RFS>/lib/modules/<kernel_version>/module.def - **This is a very important file which ist out all the dependcies between the dynamically loadable kernel modeuls.
+
+```
+module.def
+kernel/drivers/net/usb/rndis_host.ko.xz: kernel/drivers/net/usb/cdc_ether.ko.xz
+kernel/drivers/net/usb/cdc_subset.ko.xz:
+kernel/drivers/net/usb/zaurus.ko.xz: kernel/drivers/net/usb/cdc_ether.ko.xz
+kernel/drivers/net/usb/mcs7830.ko.xz:
+kernel/drivers/net/usb/int51x1.ko.xz:
+kernel/drivers/net/usb/cdc-phonet.ko.xz: kernel/net/phonet/phonet.ko.xz
+
+This file says that, before loading "rndis_host.ko", you have to first load "cdc_ether.ko"
+```
+
+## Busybox
+* Busybox is nothing but a software tool, that enables you to create a customized root file system for your embedded linx products.
+
+### Why busybox?
+1. It enables you to create customized file system that meets your resource requirements.
+2. If your product is resource limited in terms of memory, then you can customize the filesystem such a way that, it can fit into your product with limited memory space.
+3. You can use this tools to remove all unwanted features which your product doesn't need, like you can remove unwanted Linux commands and features, directories, etc. using the customiztion tools.
+4. Busybox has the potential to significantly reduce the memory consumed by various Linux commands by merging the Linux commands in one single binary.
+
+Storage space consumed by Ubuntu PC
+
+* /bin directory = ~13MB
+* /sbin directory = ~14MB
+* /usr/bin + /usr/sin = ~200MB
+
+**Busybox supports most of the commands that you can find in /bin and /sbin of your PC but with very minimal memory footprint.**
+
+* busybox - The single executable binary contains support for all the commands
+    * ls, cp, cat, mkdir, echo , rm, mv, ifconfig, iptables, wc, find, grep, ssh, insmod
+
+### Summary
+1. Busybox is a tool to generate your own customized, memory friendly file system.
+2. It does not generate individual Linux commands binaries, there is only one executable binary that's called "busybox" which implements all the required Linux commands which you can select using the configuration tool.
+
+### Build busybox
+1. Download busy
+2. Apply default configuration
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- defconfig`
+3. Change default setting if you want
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig`
+    * First let's build all the linux commands source code as a static binary instead of dynamic.
+```
+CONFIG_STATIC:                                                  
+                                                                
+If you want to build a static BusyBox binary, which does not    
+use or require any shared libraries, then enable this option.   
+This can cause BusyBox to be considerably larger, so you should 
+leave this option false unless you have a good reason (i.e.     
+your target platform does not support shared libraries, or      
+you are building an initrd which doesn't need anything but      
+BusyBox, etc).                                                  
+                                                                
+Most people will leave this set to 'N'.                         
+                                                                
+Symbol: STATIC [=n]                                             
+Prompt: Build BusyBox as a static binary (no shared libs)       
+  Defined at Config.in:343                                      
+  Location:                                                     
+    -> Busybox Settings                                         
+
+```
+
+4. Generate the busybox binary and minimal filesystem
+    * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 CONFIG_PREFIX=<install_path> install`
+    * It'll create **bin/**, **sbin/**, **usr/**, **linuxrc**
+
+```
+drwxrwxr-x 5 lazyrf lazyrf 4096 10月 17 21:52 .
+drwxrwxr-x 9 lazyrf lazyrf 4096 10月 17 21:52 ..
+drwxrwxr-x 2 lazyrf lazyrf 4096 10月 17 21:52 bin
+lrwxrwxrwx 1 lazyrf lazyrf   11 10月 17 21:52 linuxrc -> bin/busybox
+drwxrwxr-x 2 lazyrf lazyrf 4096 10月 17 21:52 sbin
+drwxrwxr-x 4 lazyrf lazyrf 4096 10月 17 21:52 usr
+
+bin/
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 ash -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 base64 -> busybox
+-rwxr-xr-x 1 lazyrf lazyrf 1361676 10月 17 21:52 busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 cat -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 catv -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 chattr -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 chgrp -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 chmod -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 chown -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 conspy -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 cp -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 cpio -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 cttyhack -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 date -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 dd -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 df -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 dmesg -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 dnsdomainname -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 dumpkmap -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 echo -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 ed -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 egrep -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 false -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 fatattr -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 fdflush -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 fgrep -> busybox
+lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 fsync -> busybox
+```
+* The default configuration generates around 89 commands in **bin/** folder. You can use "menuconfig" to increase or decrease these commands.
+* The default configuration generates around 70 commands in **sbin/** folder. You can use "menuconfig" to increase or decrease these commands.
+* All the commands point to the single binary that is "busybox".
+* Remember "busybox" binary in this case is statically linked and showing total size of 1.35MB
+* Later when we generate "busybox" with dynamic linking, the size must be < 1.35MB
