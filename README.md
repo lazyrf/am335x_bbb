@@ -1571,6 +1571,17 @@ ramdisk or initramfs|0x88080000
   CFGCHK  u-boot.cfg
 ```
 
+**Note. u-boot-2017.05-rc2 version will crash when ping anything. New version is fine.**
+
+**Note. The latest version u-boot-2020.10 will show "Wrong Image Format for bootm command. ERROR: can't get kernel image!" messages when try to bootm. "Boot images" --> "Enable support for the leagcy image format" fix this issue.**
+
+### Build result
+File|Location
+---|---
+u-boot.img|./
+MLO|./
+u-boot-spl.bin|spl/
+
 
 ## Linux Kernel source
 * Linux source
@@ -1722,14 +1733,18 @@ Entry Point:  80008000
   Kernel: arch/arm/boot/uImage is ready
 ```
 
-**The uImage is located at arch/arm/boot.**
+### Build result
+FILE|Location
+---|---
+uImage|arch/arm/boot/
+DTB|arch/arm/boot/dts
 
 5. Compile the dynamically loadable kernel modules (<M> entries)
     * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j4 modules`
 6. Intall modules (.ko files) to root file system
     * `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=<path of the RFS> modules_install`
-    * <path of the RFS>/lib/modules/<kernel_version>/module.builtin list out all statically compiled kernel modules.
-    * <path of the RFS>/lib/modules/<kernel_version>/module.def - **This is a very important file which ist out all the dependcies between the dynamically loadable kernel modeuls.
+    * <path of the RFS>/lib/modules/<kernel_version>/module.builtin  **list out all statically compiled kernel modules.**
+    * <path of the RFS>/lib/modules/<kernel_version>/module.def - **This is a very important file which ist out all the dependcies between the dynamically loadable kernel modeuls.**
 
 ```
 module.def
@@ -1841,3 +1856,364 @@ lrwxrwxrwx 1 lazyrf lazyrf       7 10月 17 21:52 fsync -> busybox
 * All the commands point to the single binary that is "busybox".
 * Remember "busybox" binary in this case is statically linked and showing total size of 1.35MB
 * Later when we generate "busybox" with dynamic linking, the size must be < 1.35MB
+
+### Build result
+File|Location
+---|---
+bin/|<install_path>/bin/
+sbin/|<install_path>/sbin/
+usr/bin/|<install_path>/usr/
+usr/sbin/|<install_path>/usr/
+linuxrc|<install_path>/
+
+
+### Tesing boot images and busybox
+1. Keep MLO, u-boot.img in the SD card.
+2. We will load the "uImage" from the host PC using "TFTP" protocol.
+    * Copy uImage to /var/lib/tftpboot
+3. We will mount the "RFS" using "NFS" protocol.
+    * Copy RFS to /srv/nfs/bbb
+
+uEnv.text
+```
+console=ttyO0,115200n8
+ipaddr=192.168.7.2
+serverip=192.168.7.1
+absolutepath=/var/lib/tftpboot/
+rootpath=/srv/nfs/bbb,nfsvers=3,tcp ip=dhcp,nolock,wsize=1024,rsize=1024 rootwait rootdealy=5
+loadtftp=echo Booting from network...; tftpboot ${loadaddr} uImage; tftpboot ${fdtaddr} am335x-boneblack.dtb
+netargs=setenv bootargs console=${console} root=/dev/nfs rw rootfstype=nfs ip=${ipaddr} nfsroot=${serverip}:${rootpath}
+uenvcmd=setenv autoload no; run loadtftp; run netargs; bootm ${loadaddr} - ${fdtaddr}
+```
+* rootdelay - Linux will halt for some seconds before trying to mount the RFS using NFS protocol
+* root=/dev/nfs - makes linux to mount the filesystem found in the nfsroot argument to mount point "/"
+
+4. Install NFS server and configure the access control file (/etc/exports)
+    * `sudo apt install nfs-kernel-server nfs-common`
+    * Modify the /etc/exports
+```
+# /etc/exports: the access control list for filesystems which may be exported
+#		to NFS clients.  See exports(5).
+#
+# Example for NFSv2 and NFSv3:
+# /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
+#
+# Example for NFSv4:
+# /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
+# /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
+#
+/srv/nfs/bbb 192.168.7.2(rw,sync,no_root_squash,no_subtree_check)
+
+```
+
+5. NFS mounting
+    * `sudo exportfs -a`
+    * `sudo exportfs -rv`
+    * `sudo systemctl restart nfs-kernel-server`
+
+```
+[    2.401473] net eth0: initializing cpsw version 1.12 (0)
+[    2.480572] SMSC LAN8710/LAN8720 4a101000.mdio:00: attached PHY driver [SMSC LAN8710/LAN8720)
+[    2.499904] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    2.505814] 8021q: adding VLAN 0 to HW filter on device eth0
+[    3.167876] [drm] Cannot find any crtc or sizes
+[    4.544604] cpsw 4a100000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[    4.552754] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    4.571591] IP-Config: Guessing netmask 255.255.255.0
+[    4.576809] IP-Config: Complete:
+[    4.580129]      device=eth0, hwaddr=04:79:b7:f1:b9:12, ipaddr=192.168.7.2, mask=255.255.2555
+[    4.590595]      host=192.168.7.2, domain=, nis-domain=(none)
+[    4.596394]      bootserver=255.255.255.255, rootserver=192.168.7.1, rootpath=
+[    4.604193] ALSA device list:
+[    4.607185]   #0: TI BeagleBone Black
+[    6.667134] VFS: Mounted root (nfs filesystem) on device 0:18.
+[    6.673877] devtmpfs: error mounting -2
+[    6.681066] Freeing unused kernel memory: 1024K
+can't run '/etc/init.d/rcS': No such file or director
+```
+
+### Busybox "init" and rcS script
+![linux_init_program](imgs/linux_init_program.png)
+
+* If you have any scripts or services to execute during starting up of the Linux kernel then you can execute all those scripts of services or commands from this file.
+![rcS](imgs/rcS.png)
+* rcS - "**S**" means start. This is used to start sevices
+* rcK - "**K**" means kill. This is used to shutodwn services
+
+rcS script
+```
+#!/bin/sh
+
+
+# Start all init scripts in /etc/init.d
+# executing them in numerical order.
+#
+echo "Mounting proc"
+mount -t proc /proc /proc
+
+for i in /etc/init.d/S??* ;do
+
+     # Ignore dangling symlinks (if any).
+     [ ! -f "$i" ] && continue
+
+     case "$i" in
+	*.sh)
+	    # Source shell script for speed.
+	    (
+		trap - INT QUIT TSTP
+		set start
+		. $i
+	    )
+	    ;;
+	*)
+	    # No sh extension, so fork subprocess.
+	    $i start
+	    ;;
+    esac
+done
+
+```
+
+### Enabling ethernet over usb by driver integration
+
+* **lsmod** command lists all the loadable kernel modules currently runing in the system.
+
+```
+/ # lsmod
+usb_f_ecm 20480 1 - Live 0xbf042000
+g_ether 16384 0 - Live 0xbf039000
+usb_f_rndis 32768 2 g_ether, Live 0xbf02a000
+u_ether 20480 3 usb_f_ecm,g_ether,usb_f_rndis, Live 0xbf021000
+libcomposite 65536 3 usb_f_ecm,g_ether,usb_f_rndis, Live 0xbf009000
+```
+
+* **modprobe** command will check module.dep file and load all dependent module before.
+```
+/ # modprobe g_ether
+[  200.428197] using random self ethernet address
+[  200.432873] using random host ethernet address
+Jan  1 00:38:50 192 user.warn kernel: [  200.428197] using rando[  200.439188] usb0: HOST MAC 32:58:46:ed:66:3f
+m self ethernet address
+Jan  1 00:38:50 192 user.warn kernel: [[  200.448324] usb0: MAC 82:7f:d8:c6:8f:c2
+  200.432873] using random host ethernet address
+[  200.458214] using random self ethernet address
+Jan  1 00:38:50 192 user.info kernel: [  200.439188] usb0: HOST [  200.466702] using random host ethernet address
+MAC 32:58:46:ed:66:3f
+Jan  1 00:38:50 192 user.info kernel: [  [  200.477136] g_ether gadget: Ethernet Gadget, version: Memorial Day 2008
+200.448324] usb0: MAC 82:7f:d8:c6:8f:c2
+Jan  1 00:38:50 192 use[  200.488847] g_ether gadget: g_ether ready
+r.warn kernel: [  200.458214] using random self ethernet address
+Jan  1 00:38:50 192 user.warn kernel: [  200.466702] using random host ethernet address
+Jan  1 00:38:50 192 user.info kernel: [  200.477136] g_ether gadget: Ethernet Gadget, version: Memorial Day 2008
+Jan  1 00:38:50 192 user.info kernel: [  200.488847] g_ether gadget: g_ether ready
+
+/ # lsmod
+usb_f_ecm 20480 1 - Live 0xbf039000
+g_ether 16384 0 - Live 0xbf030000
+usb_f_rndis 32768 2 g_ether, Live 0xbf021000
+u_ether 20480 3 usb_f_ecm,g_ether,usb_f_rndis, Live 0xbf018000
+libcomposite 65536 3 usb_f_ecm,g_ether,usb_f_rndis, Live 0xbf00000
+
+/ # ifconfig usb0 192.168.6.2 up
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 04:79:B7:F1:B9:12
+          inet addr:192.168.7.2  Bcast:192.168.7.255  Mask:255.255.255.0
+          inet6 addr: fe80::679:b7ff:fef1:b912/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1706 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1350 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:2201722 (2.0 MiB)  TX bytes:176766 (172.6 KiB)
+          Interrupt:45
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+usb0      Link encap:Ethernet  HWaddr 36:AA:94:06:C2:E4
+          inet addr:192.168.6.2  Bcast:192.168.6.255  Mask:255.255.255.0
+          inet6 addr: fe80::34aa:94ff:fe06:c2e4/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:13 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:6 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1999 (1.9 KiB)  TX bytes:516 (516.0 B)
+```
+
+### Load usb ehternet drivers automatically during system startup
+
+1. Create `/etc/netowrk/interfaces` file
+
+```
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+        address 192.168.7.2
+        netmask 255.255.255.0
+        network 192.168.7.0
+        gateway 192.168.7.1
+
+auto usb0
+iface usb0 inet static
+        address 192.168.6.2
+        netmask 255.255.255.0
+        network 192.168.6.0
+        gateway 192.168.6.1
+```
+
+2. Create S02module script to modprobe module
+
+```
+/ # cat /etc/init.d/S02module
+#!/bin/sh
+#
+# Load the kernel modules at startup
+#
+
+case "$1" in
+  start)
+        printf "Loading kernel modules:"
+        /sbin/modprobe g_ether
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  stop)
+        printf "Unloading kernel modules:"
+        /sbin/rmmod g_ether
+        [ $? = 0 ] && echo "OK" || echo "FAIL"
+        ;;
+  restart|reload)
+        "$0" stop
+        "$0" start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $
+```
+
+
+**Note.Busybox package doesn't support ssh, get it from third party packages such as "dropbear"**
+
+**Note.Which run level directory scripts in /etc/ will be executed when you reboot your Linux PC? Answer: rc6.**
+
+
+### Install ssh (dropbear)
+1. Download dropbear
+2. Configure dropbear
+    * `./configure --host=arm-linux-gnueabihf --disable-zlib --prefix=<location_path> CC=arm-linux-gnueabihf-gcc`
+3. Compile the dropbear as static
+    * `make PROGRAMS="dropbear dropbearkey dbclient scp" STATIC=1`
+4. Install dropbear generated binaries
+    * `make PROGRAMS="dropbear dropbearkey dbclient scp" install`
+5. Copy bin/ and sbin/ binaries to RFS
+
+
+## Buildroot
+* Buildroot is a simple, efficient and easy-to-use tool to generate embedded Linux system through cross-compilation.
+* [User manual](https://buildroot.org/downloads/manual/manual.html)
+
+Readme.txt for BeagleBone Black board
+```
+CircuitCo BeagleBone
+Texas Instuments AM335x Evaluation Module (TMDXEVM3358)
+
+Description
+===========
+
+This configuration will build a complete image for the beaglebone and
+the TI AM335x-EVM, the board type is identified by the on-board
+EEPROM. The configuration is based on the
+ti-processor-sdk-02.00.00.00. Device tree blobs for beaglebone
+variants and the evm-sk are built too.
+
+For Qt5 support support use the beaglebone_qt5_defconfig.
+
+How to build it
+===============
+
+Select the default configuration for the target:
+$ make beaglebone_defconfig
+
+Optional: modify the configuration:
+$ make menuconfig
+
+Build:
+$ make
+
+Result of the build
+===================
+output/images/
++-- am335x-boneblack.dtb
++-- am335x-bone.dtb
++-- am335x-evm.dtb
++-- am335x-evmsk.dtb
++-- boot.vfat
++-- MLO
++-- rootfs.ext2
++-- rootfs.tar
++-- sdcard.img
++-- u-boot.img
++-- uEnv.txt
++-- zImage
+
+To copy the image file to the sdcard use dd:
+$ dd if=output/images/sdcard.img of=/dev/XXX
+
+Tested hardware
+===============
+am335x-evm (rev. 1.1A)
+beagleboneblack (rev. A5A)
+beaglebone (rev. A6)
+
+2016, Lothar Felten <lothar.felten@gmail.com>
+```
+
+### Question
+
+1. Build break with below messages
+```
+/usr/bin/install -D -m 0755 /home/aron/learning/embedded_linux/buildroot/buildroot-2020.08/output/build/toolchain-external-custom/toolchain-wrapper /home/aron/learning/embedded_linux/buildroot/buildroot-2020.08/output/host/bin/toolchain-wrapper
+ln: failed to create symbolic link '/home/aron/learning/embedded_linux/buildroot/buildroot-2020.08/output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/lib': 沒有此一檔案或目錄
+make[1]: *** [package/pkg-generic.mk:289：/home/aron/learning/embedded_linux/buildroot/buildroot-2020.08/output/build/toolchain-external-custom/.stamp_staging_installed] 錯誤 1
+make: *** [Makefile:84：_all] 錯誤 
+```
+
+*The root casuse is buildroot dosen't clean after change the toolcahin. So, make clean and make again.*
+
+2. Console is not work
+
+*Use "ttyS0" instead of "ttyO0"
+
+### Test buildroot RFS
+* Extract output/images/rootfs.tar to /srv/nfs/bbb
+* Test ssh to BBB
+    1. Modify /etc/ssh/sshd_config, enable PermitRootLogin
+```
+# Authentication:
+
+#LoginGraceTime 2m
+#PermitRootLogin prohibit-password
+PermitRootLogin yes
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+```
+    2. Restart sshd
+```
+# ./S50sshd restart
+Stopping sshd: OK
+Starting sshd: O
+```
+
+### Buildroot Linux and U-boot configurations
