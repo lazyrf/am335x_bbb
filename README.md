@@ -2217,3 +2217,1136 @@ Starting sshd: O
 ```
 
 ### Buildroot Linux and U-boot configurations
+
+```
+#
+# Automatically generated file; DO NOT EDIT.
+# Buildroot 2020.08 Configuration
+#
+BR2_HAVE_DOT_CONFIG=y
+BR2_HOST_GCC_AT_LEAST_4_9=y
+BR2_HOST_GCC_AT_LEAST_5=y
+BR2_HOST_GCC_AT_LEAST_6=y
+BR2_HOST_GCC_AT_LEAST_7=y
+BR2_HOST_GCC_AT_LEAST_8=y
+BR2_HOST_GCC_AT_LEAST_9=y
+
+#
+# Target options
+#
+BR2_ARCH_HAS_MMU_OPTIONAL=y
+BR2_arm=y
+BR2_ARCH_HAS_TOOLCHAIN_BUILDROOT=y
+BR2_ARCH="arm"
+BR2_ENDIAN="LITTLE"
+BR2_GCC_TARGET_ABI="aapcs-linux"
+BR2_GCC_TARGET_CPU="cortex-a8"
+BR2_GCC_TARGET_FPU="vfpv3-d16"
+BR2_GCC_TARGET_FLOAT_ABI="hard"
+BR2_GCC_TARGET_MODE="arm"
+BR2_BINFMT_SUPPORTS_SHARED=y
+BR2_READELF_ARCH_NAME="ARM"
+BR2_BINFMT_ELF=y
+BR2_ARM_CPU_HAS_NEON=y
+BR2_ARM_CPU_HAS_FPU=y
+BR2_ARM_CPU_HAS_VFPV2=y
+BR2_ARM_CPU_HAS_VFPV3=y
+BR2_ARM_CPU_HAS_ARM=y
+BR2_ARM_CPU_HAS_THUMB2=y
+BR2_ARM_CPU_ARMV7A=y
+
+#
+# armv7a cores
+#
+BR2_cortex_a8=y
+
+#
+# armv8.4a cores
+#
+BR2_ARM_EABIHF=y
+BR2_ARM_FPU_VFPV3D16=y
+BR2_ARM_INSTRUCTIONS_ARM=y
+
+#
+# Build options
+#
+
+#
+# Commands
+#
+BR2_WGET="wget --passive-ftp -nd -t 3"
+BR2_SVN="svn --non-interactive"
+BR2_BZR="bzr"
+BR2_GIT="git"
+BR2_CVS="cvs"
+BR2_LOCALFILES="cp"
+BR2_SCP="scp"
+BR2_HG="hg"
+BR2_ZCAT="gzip -d -c"
+BR2_BZCAT="bzcat"
+BR2_XZCAT="xzcat"
+BR2_LZCAT="lzip -d -c"
+BR2_TAR_OPTIONS=""
+BR2_DEFCONFIG="/home/aron/learning/embedded_linux/buildroot/buildroot-2020.08/configs/beaglebone_defconfig"
+BR2_DL_DIR="$(TOPDIR)/dl"
+BR2_HOST_DIR="$(BASE_DIR)/host"
+
+#
+# Mirrors and Download locations
+#
+BR2_PRIMARY_SITE=""
+BR2_BACKUP_SITE="http://sources.buildroot.net"
+BR2_KERNEL_MIRROR="https://cdn.kernel.org/pub"
+BR2_GNU_MIRROR="http://ftpmirror.gnu.org"
+BR2_LUAROCKS_MIRROR="http://rocks.moonscript.org"
+BR2_CPAN_MIRROR="http://cpan.metacpan.org"
+BR2_JLEVEL=0
+BR2_STRIP_strip=y
+BR2_STRIP_EXCLUDE_FILES=""
+BR2_STRIP_EXCLUDE_DIRS=""
+BR2_OPTIMIZE_S=y
+BR2_SHARED_LIBS=y
+BR2_PACKAGE_OVERRIDE_FILE="$(CONFIG_DIR)/local.mk"
+BR2_GLOBAL_PATCH_DIR="board/beaglebone/patches"
+
+#
+# Advanced
+#
+BR2_COMPILER_PARANOID_UNSAFE_PATH=y
+
+#
+# Security Hardening Options
+#
+BR2_SSP_NONE=y
+BR2_RELRO_NONE=y
+BR2_FORTIFY_SOURCE_NONE=y
+
+#
+# Toolchain
+#
+BR2_TOOLCHAIN=y
+BR2_TOOLCHAIN_USES_GLIBC=y
+BR2_TOOLCHAIN_EXTERNAL=y
+
+#
+# Toolchain External Options
+#
+BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM=y
+
+#
+# Sourcery CodeBench toolchains available for the EABI ABI
+#
+BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y
+BR2_TOOLCHAIN_EXTERNAL_PATH="/home/aron/tools/arm/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf"
+BR2_TOOLCHAIN_EXTERNAL_GLIBC=y
+BR2_PACKAGE_HAS_TOOLCHAIN_EXTERNAL=y
+BR2_PACKAGE_PROVIDES_TOOLCHAIN_EXTERNAL="toolchain-external-linaro-arm"
+BR2_TOOLCHAIN_EXTERNAL_PREFIX="arm-linux-gnueabihf"
+BR2_PACKAGE_HOST_GDB_ARCH_SUPPORTS=y
+
+#
+# Host GDB Options
+#
+
+#
+# Toolchain Generic Options
+#
+BR2_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS=y
+BR2_TOOLCHAIN_SUPPORTS_VARIADIC_MI_THUNK=y
+BR2_TOOLCHAIN_HAS_NATIVE_RPC=y
+BR2_USE_WCHAR=y
+BR2_ENABLE_LOCALE=y
+BR2_INSTALL_LIBSTDCPP=y
+BR2_TOOLCHAIN_HAS_FORTRAN=y
+BR2_TOOLCHAIN_HAS_THREADS=y
+BR2_TOOLCHAIN_HAS_THREADS_DEBUG=y
+BR2_TOOLCHAIN_HAS_THREADS_NPTL=y
+BR2_TOOLCHAIN_HAS_SSP=y
+BR2_TOOLCHAIN_HAS_SSP_STRONG=y
+BR2_TOOLCHAIN_HAS_UCONTEXT=y
+BR2_TOOLCHAIN_HAS_OPENMP=y
+BR2_TOOLCHAIN_SUPPORTS_PIE=y
+BR2_TOOLCHAIN_EXTRA_LIBS=""
+BR2_TOOLCHAIN_HAS_FULL_GETTEXT=y
+BR2_USE_MMU=y
+BR2_TARGET_OPTIMIZATION=""
+BR2_TARGET_LDFLAGS=""
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_0=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_1=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_2=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_4=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_5=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_6=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_7=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_9=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_10=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_11=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_12=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_13=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_14=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_15=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_16=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_18=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_19=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_0=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_1=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_2=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_3=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_4=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_5=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_6=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_7=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_8=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_9=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_10=y
+BR2_TOOLCHAIN_HEADERS_AT_LEAST="4.10"
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_3=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_4=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_5=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_6=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_7=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_8=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_4_9=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_5=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_6=y
+BR2_TOOLCHAIN_GCC_AT_LEAST_7=y
+BR2_TOOLCHAIN_GCC_AT_LEAST="7"
+BR2_TOOLCHAIN_HAS_MNAN_OPTION=y
+BR2_TOOLCHAIN_HAS_SYNC_1=y
+BR2_TOOLCHAIN_HAS_SYNC_2=y
+BR2_TOOLCHAIN_HAS_SYNC_4=y
+BR2_TOOLCHAIN_ARM_HAS_SYNC_8=y
+BR2_TOOLCHAIN_HAS_SYNC_8=y
+BR2_TOOLCHAIN_HAS_LIBATOMIC=y
+BR2_TOOLCHAIN_HAS_ATOMIC=y
+
+#
+# System configuration
+#
+BR2_ROOTFS_SKELETON_DEFAULT=y
+BR2_TARGET_GENERIC_HOSTNAME="aron"
+BR2_TARGET_GENERIC_ISSUE="Welcome to Buildroot-BBB"
+BR2_TARGET_GENERIC_PASSWD_SHA256=y
+BR2_TARGET_GENERIC_PASSWD_METHOD="sha-256"
+BR2_INIT_BUSYBOX=y
+BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_DEVTMPFS=y
+BR2_ROOTFS_DEVICE_TABLE="system/device_table.txt"
+BR2_TARGET_ENABLE_ROOT_LOGIN=y
+BR2_TARGET_GENERIC_ROOT_PASSWD="root"
+BR2_SYSTEM_BIN_SH_BUSYBOX=y
+
+#
+# bash, dash, mksh, zsh need BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
+#
+BR2_TARGET_GENERIC_GETTY=y
+BR2_TARGET_GENERIC_GETTY_PORT="ttyS0"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_TARGET_GENERIC_GETTY_BAUDRATE="115200"
+BR2_TARGET_GENERIC_GETTY_TERM="vt100"
+BR2_TARGET_GENERIC_GETTY_OPTIONS=""
+BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW=y
+BR2_SYSTEM_DHCP=""
+BR2_SYSTEM_DEFAULT_PATH="/bin:/sbin:/usr/bin:/usr/sbin"
+BR2_ENABLE_LOCALE_PURGE=y
+BR2_ENABLE_LOCALE_WHITELIST="C en_US"
+BR2_GENERATE_LOCALE=""
+BR2_ROOTFS_USERS_TABLES=""
+BR2_ROOTFS_OVERLAY=""
+BR2_ROOTFS_POST_BUILD_SCRIPT="board/beaglebone/post-build.sh"
+BR2_ROOTFS_POST_FAKEROOT_SCRIPT=""
+BR2_ROOTFS_POST_IMAGE_SCRIPT="support/scripts/genimage.sh"
+BR2_ROOTFS_POST_SCRIPT_ARGS="-c board/beaglebone/genimage.cfg"
+
+#
+# Kernel
+#
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_LATEST_VERSION=y
+BR2_LINUX_KERNEL_VERSION="5.7.19"
+BR2_LINUX_KERNEL_PATCH=""
+BR2_LINUX_KERNEL_USE_DEFCONFIG=y
+BR2_LINUX_KERNEL_DEFCONFIG="omap2plus"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES=""
+BR2_LINUX_KERNEL_CUSTOM_LOGO_PATH=""
+BR2_LINUX_KERNEL_UIMAGE=y
+BR2_LINUX_KERNEL_GZIP=y
+BR2_LINUX_KERNEL_UIMAGE_LOADADDR="0x80008000"
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_DTB_IS_SELF_BUILT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="am335x-boneblack"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH=""
+
+#
+# Linux Kernel Extensions
+#
+
+#
+# Linux Kernel Tools
+#
+
+#
+# Target packages
+#
+BR2_PACKAGE_BUSYBOX=y
+BR2_PACKAGE_BUSYBOX_CONFIG="package/busybox/busybox.config"
+BR2_PACKAGE_BUSYBOX_CONFIG_FRAGMENT_FILES=""
+BR2_PACKAGE_SKELETON=y
+BR2_PACKAGE_HAS_SKELETON=y
+BR2_PACKAGE_PROVIDES_SKELETON="skeleton-init-sysv"
+BR2_PACKAGE_SKELETON_INIT_COMMON=y
+BR2_PACKAGE_SKELETON_INIT_SYSV=y
+
+#
+# Audio and video applications
+#
+BR2_PACKAGE_FFMPEG_ARCH_SUPPORTS=y
+BR2_PACKAGE_KODI_ARCH_SUPPORTS=y
+
+#
+# miraclecast needs systemd and a glibc toolchain w/ threads and wchar
+#
+BR2_PACKAGE_PULSEAUDIO_HAS_ATOMIC=y
+
+#
+# dacapo needs OpenJDK
+#
+BR2_PACKAGE_GDB_ARCH_SUPPORTS=y
+BR2_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS=y
+BR2_PACKAGE_LTP_TESTSUITE_ARCH_SUPPORTS=y
+BR2_PACKAGE_LTRACE_ARCH_SUPPORTS=y
+BR2_PACKAGE_OPROFILE_ARCH_SUPPORTS=y
+BR2_PACKAGE_PTM2HUMAN_ARCH_SUPPORTS=y
+
+#
+# sysdig needs a glibc or uclibc toolchain w/ C++, threads, gcc >= 4.8, dynamic library, a Linux kernel, and luajit or lua 5.1 to be built
+#
+BR2_PACKAGE_TCF_AGENT_ARCH="arm"
+BR2_PACKAGE_TCF_AGENT_ARCH_SUPPORTS=y
+BR2_PACKAGE_TRINITY_ARCH_SUPPORTS=y
+BR2_PACKAGE_VALGRIND_ARCH_SUPPORTS=y
+
+#
+# Development tools
+#
+BR2_PACKAGE_CMAKE_ARCH_SUPPORTS=y
+BR2_PACKAGE_PROVIDES_HOST_GETTEXT="host-gettext-tiny"
+
+#
+# glslsandbox-player needs a toolchain w/ threads and an openGL ES and EGL driver
+#
+BR2_PACKAGE_NETSURF_ARCH_SUPPORTS=y
+
+#
+# Other GUIs
+#
+BR2_PACKAGE_QT5_JSCORE_AVAILABLE=y
+
+#
+# brickd needs udev /dev management, a toolchain w/ threads, wchar
+#
+BR2_PACKAGE_CPUBURN_ARM_ARCH_SUPPORTS=y
+
+#
+# eudev needs eudev /dev management
+#
+BR2_PACKAGE_FLASHROM_ARCH_SUPPORTS=y
+
+#
+# owl-linux is only supported on ARM9 architecture
+#
+BR2_PACKAGE_SEDUTIL_ARCH_SUPPORTS=y
+
+#
+# Interpreter languages and scripting
+#
+BR2_PACKAGE_HOST_ERLANG_ARCH_SUPPORTS=y
+BR2_PACKAGE_ERLANG_ARCH_SUPPORTS=y
+BR2_PACKAGE_GAUCHE_ARCH_SUPPORTS=y
+BR2_PACKAGE_PROVIDES_HOST_LUAINTERPRETER="host-lua"
+BR2_PACKAGE_LUAJIT_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_MONO_ARCH_SUPPORTS=y
+BR2_PACKAGE_MONO_ARCH_SUPPORTS=y
+BR2_PACKAGE_NODEJS_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_OPENJDK_BIN_ARCH_SUPPORTS=y
+BR2_PACKAGE_OPENJDK_ARCH_SUPPORTS=y
+
+#
+# openjdk needs X.Org
+#
+
+#
+# Libraries
+#
+
+#
+# Audio/Sound
+#
+BR2_PACKAGE_FDK_AAC_ARCH_SUPPORTS=y
+BR2_PACKAGE_OPENAL_ARCH_SUPPORTS=y
+BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS=y
+
+#
+# Compression and decompression
+#
+BR2_PACKAGE_ZLIB_NG_ARCH_SUPPORTS=y
+BR2_PACKAGE_ZLIB=y
+BR2_PACKAGE_LIBZLIB=y
+BR2_PACKAGE_HAS_ZLIB=y
+BR2_PACKAGE_PROVIDES_ZLIB="libzlib"
+BR2_PACKAGE_PROVIDES_HOST_ZLIB="host-libzlib"
+
+#
+# Crypto
+#
+BR2_PACKAGE_BOTAN_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBGPG_ERROR_SYSCFG="arm-unknown-linux-gnueabi"
+BR2_PACKAGE_OPENSSL=y
+BR2_PACKAGE_LIBOPENSSL=y
+BR2_PACKAGE_LIBOPENSSL_TARGET_ARCH="linux-armv4"
+BR2_PACKAGE_HAS_OPENSSL=y
+BR2_PACKAGE_PROVIDES_OPENSSL="libopenssl"
+BR2_PACKAGE_PROVIDES_HOST_OPENSSL="host-libopenssl"
+
+#
+# Database
+#
+BR2_PACKAGE_MONGODB_ARCH_SUPPORTS=y
+
+#
+# irrlicht needs X11 and an OpenGL provider
+#
+BR2_PACKAGE_JPEG_SIMD_SUPPORT=y
+
+#
+# pipewire needs udev and a toolchain w/ threads
+#
+BR2_PACKAGE_WEBKITGTK_ARCH_SUPPORTS=y
+
+#
+# webkitgtk needs libgtk3 and a glibc toolchain w/ C++, gcc >= 7, host gcc >= 4.9
+#
+
+#
+# wlroots needs udev, mesa3d w/ EGL and GLES support
+#
+
+#
+# wpebackend-fdo needs a toolchain w/ C++, wchar, threads, dynamic library and an OpenEGL-capable Wayland backend
+#
+BR2_PACKAGE_WPEWEBKIT_ARCH_SUPPORTS=y
+
+#
+# wpewebkit needs an OpenGL ES w/ EGL-capable Wayland backend
+#
+
+#
+# Hardware handling
+#
+BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS=y
+
+#
+# hidapi needs udev /dev management and a toolchain w/ NPTL threads
+#
+
+#
+# libatasmart requires udev to be enabled
+#
+
+#
+# libgudev needs udev /dev handling and a toolchain w/ wchar, threads
+#
+
+#
+# libinput needs udev /dev management
+#
+BR2_PACKAGE_MRAA_ARCH_SUPPORTS=y
+
+#
+# Javascript
+#
+BR2_PACKAGE_SPIDERMONKEY_ARCH_SUPPORTS=y
+BR2_PACKAGE_SPIDERMONKEY_JIT_ARCH_SUPPORTS=y
+
+#
+# JSON/XML
+#
+
+#
+# Logging
+#
+
+#
+# Multimedia
+#
+
+#
+# libimxvpuapi needs an i.MX platform with VPU support
+#
+BR2_PACKAGE_LIBOPENH264_ARCH_SUPPORTS=y
+
+#
+# Networking
+#
+BR2_PACKAGE_CANFESTIVAL_ARCH_SUPPORTS=y
+
+#
+# Other
+#
+
+#
+# ell needs a toolchain w/ dynamic library, wchar, headers >= 4.12
+#
+BR2_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS=y
+
+#
+# gobject-introspection needs python3
+#
+BR2_PACKAGE_JEMALLOC_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBBSD_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBNSPR_ARCH_SUPPORT=y
+BR2_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBSIGSEGV_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBUNWIND_ARCH_SUPPORTS=y
+BR2_PACKAGE_LIBURCU_ARCH_SUPPORTS=y
+BR2_PACKAGE_LLVM_ARCH_SUPPORTS=y
+BR2_PACKAGE_LLVM_TARGET_ARCH="ARM"
+BR2_PACKAGE_OPENBLAS_DEFAULT_TARGET="ARMV7"
+BR2_PACKAGE_OPENBLAS_ARCH_SUPPORTS=y
+BR2_PACKAGE_POCO_ARCH_SUPPORTS=y
+BR2_PACKAGE_PROTOBUF_ARCH_SUPPORTS=y
+
+#
+# Security
+#
+
+#
+# Text and terminal handling
+#
+
+#
+# Mail
+#
+
+#
+# Miscellaneous
+#
+BR2_PACKAGE_BITCOIN_ARCH_SUPPORTS=y
+
+#
+# domoticz needs lua 5.3 and a toolchain w/ C++, gcc >= 4.8, NPTL, wchar, dynamic library
+#
+
+#
+# gqrx needs a toolchain w/ C++, threads, wchar, dynamic library
+#
+
+#
+# gqrx needs qt5
+#
+BR2_PACKAGE_QEMU_ARCH_SUPPORTS_TARGET=y
+
+#
+# Networking applications
+#
+
+#
+# connman-gtk needs libgtk3 and a glibc or uClibc toolchain w/ wchar, threads, resolver, dynamic library
+#
+
+#
+# ejabberd needs erlang, toolchain w/ C++
+#
+
+#
+# gupnp-tools needs libgtk3
+#
+BR2_PACKAGE_HAPROXY_ARCH_SUPPORTS=y
+BR2_PACKAGE_IFUPDOWN_SCRIPTS=y
+
+#
+# iwd needs a toolchain w/ threads, dynamic library, wchar, headers >= 4.12
+#
+BR2_PACKAGE_MONGREL2_LIBC_SUPPORTS=y
+
+#
+# NetworkManager needs udev /dev management and a glibc toolchain w/ headers >= 3.2, dynamic library, wchar, threads
+#
+BR2_PACKAGE_OPENSSH=y
+BR2_PACKAGE_OPENSSH_CLIENT=y
+BR2_PACKAGE_OPENSSH_SERVER=y
+BR2_PACKAGE_OPENSSH_KEY_UTILS=y
+
+#
+# -------------------------------------------------------
+#
+
+#
+# Real-Time
+#
+BR2_PACKAGE_XENOMAI_COBALT_ARCH_SUPPORTS=y
+
+#
+# Security
+#
+
+#
+# setools needs python3
+#
+BR2_PACKAGE_URANDOM_SCRIPTS=y
+
+#
+# Shell and utilities
+#
+
+#
+# Shells
+#
+
+#
+# Utilities
+#
+
+#
+# System tools
+#
+BR2_PACKAGE_AUDIT_ARCH_SUPPORTS=y
+
+#
+# circus needs Python 3 and a toolchain w/ C++, threads
+#
+BR2_PACKAGE_EFIVAR_ARCH_SUPPORTS=y
+BR2_PACKAGE_INITSCRIPTS=y
+
+#
+# iotop depends on python or python3
+#
+
+#
+# netifrc needs openrc as init system
+#
+
+#
+# pamtester depends on linux-pam
+#
+
+#
+# sdbusplus needs systemd and a toolchain w/ C++, gcc >= 7
+#
+
+#
+# supervisor needs a python interpreter
+#
+BR2_PACKAGE_SYSTEMD_ARCH_SUPPORTS=y
+BR2_PACKAGE_SYSTEMD_BOOTCHART_ARCH_SUPPORTS=y
+BR2_PACKAGE_XVISOR_ARCH_SUPPORTS=y
+
+#
+# Text editors and viewers
+#
+
+#
+# Filesystem images
+#
+BR2_TARGET_ROOTFS_EXT2=y
+BR2_TARGET_ROOTFS_EXT2_4=y
+BR2_TARGET_ROOTFS_EXT2_GEN=4
+BR2_TARGET_ROOTFS_EXT2_REV=1
+BR2_TARGET_ROOTFS_EXT2_LABEL="rootfs"
+BR2_TARGET_ROOTFS_EXT2_SIZE="60M"
+BR2_TARGET_ROOTFS_EXT2_INODES=0
+BR2_TARGET_ROOTFS_EXT2_RESBLKS=5
+BR2_TARGET_ROOTFS_EXT2_MKFS_OPTIONS="-O ^64bit"
+BR2_TARGET_ROOTFS_EXT2_NONE=y
+BR2_TARGET_ROOTFS_TAR=y
+BR2_TARGET_ROOTFS_TAR_NONE=y
+BR2_TARGET_ROOTFS_TAR_OPTIONS=""
+
+#
+# Bootloaders
+#
+BR2_TARGET_GRUB2_ARCH_SUPPORTS=y
+BR2_TARGET_UBOOT=y
+BR2_TARGET_UBOOT_BUILD_SYSTEM_KCONFIG=y
+BR2_TARGET_UBOOT_LATEST_VERSION=y
+BR2_TARGET_UBOOT_VERSION="2020.07"
+BR2_TARGET_UBOOT_PATCH=""
+BR2_TARGET_UBOOT_USE_DEFCONFIG=y
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="am335x_boneblack_vboot"
+BR2_TARGET_UBOOT_CONFIG_FRAGMENT_FILES=""
+BR2_TARGET_UBOOT_NEEDS_DTC=y
+BR2_TARGET_UBOOT_NEEDS_PYTHON_NONE=y
+
+#
+# U-Boot binary format
+#
+BR2_TARGET_UBOOT_FORMAT_IMG=y
+BR2_TARGET_UBOOT_SPL=y
+BR2_TARGET_UBOOT_SPL_NAME="MLO"
+BR2_TARGET_UBOOT_CUSTOM_DTS_PATH=""
+BR2_TARGET_UBOOT_CUSTOM_MAKEOPTS=""
+
+#
+# Host utilities
+#
+BR2_PACKAGE_HOST_DOSFSTOOLS=y
+BR2_PACKAGE_HOST_DTC=y
+BR2_PACKAGE_HOST_E2FSPROGS=y
+BR2_PACKAGE_HOST_GENIMAGE=y
+BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS=y
+BR2_PACKAGE_HOST_GO_HOST_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_GO_BOOTSTRAP_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_GOOGLE_BREAKPAD_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_MKPASSWD=y
+BR2_PACKAGE_HOST_MTOOLS=y
+BR2_PACKAGE_HOST_PATCHELF=y
+BR2_PACKAGE_HOST_QEMU_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_QEMU_SYSTEM_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_RUSTC_ARCH="armv7"
+BR2_PACKAGE_HOST_RUSTC_ABI="eabihf"
+BR2_PACKAGE_PROVIDES_HOST_RUSTC="host-rust-bin"
+BR2_PACKAGE_HOST_TI_CGT_PRU_ARCH_SUPPORTS=y
+BR2_PACKAGE_HOST_UBOOT_TOOLS=y
+BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SUPPORT=y
+BR2_PACKAGE_HOST_UTIL_LINUX=y
+
+#
+# Legacy config options
+#
+
+#
+# Legacy options removed in 2020.02
+#
+BR2_PACKAGE_REFPOLICY_POLICY_VERSION=""
+
+#
+# Legacy options removed in 2019.11
+#
+BR2_TOOLCHAIN_EXTRA_EXTERNAL_LIBS=""
+
+#
+# Legacy options removed in 2017.08
+#
+BR2_XTENSA_OVERLAY_DIR=""
+BR2_XTENSA_CUSTOM_NAME=""
+BR2_TARGET_ROOTFS_EXT2_BLOCKS=0
+BR2_TARGET_ROOTFS_EXT2_EXTRA_INODES=0
+
+#
+# Legacy options removed in 2017.05
+#
+BR2_TARGET_ROOTFS_EXT2_EXTRA_BLOCKS=0
+
+#
+# Legacy options removed in 2016.05
+#
+BR2_TARGET_UBOOT_CUSTOM_PATCH_DIR=""
+```
+
+## AM335x Pin details, gpios, and SYSFS control
+
+### AM335x GPIO
+* The general-purpose interface combines four general-purpose input/output (GPIO) module, GPIO0, GPIO1, GPIO2, GPIO3.
+* Each GPIO module provides 32 dedicated general-purpose pins with input and output capabilities.
+* Thus, the general purpose interface supports up to 128 (4 * 32) pins.
+* Pin configuration registers are present at offset 800h. Base address (of the control module registers) + 800h.
+    * Base address of the control module engine register is 0x44E1_0000
+
+![pin_definition](imgs/pin_definition.png)
+
+* The gpio pin register sequence follows **module** and **pin** (ex. GMPC_A0, GPMC_A1) not GPIO name convection order (ex. GPIO1_2, GPIO1_3);
+
+![gpio_pin_register](imgs/gpio_pin_register.png)
+
+```
+debian@beaglebone:~$ ls /sys/class/gpio/
+export   gpio117  gpio27  gpio38  gpio50  gpio69  gpio78  gpiochip0
+gpio10   gpio12   gpio3   gpio39  gpio51  gpio7   gpio79  gpiochip32
+gpio11   gpio13   gpio30  gpio4   gpio60  gpio70  gpio8   gpiochip64
+gpio110  gpio14   gpio31  gpio44  gpio61  gpio71  gpio80  gpiochip96
+gpio111  gpio15   gpio32  gpio45  gpio62  gpio72  gpio81  unexport
+gpio112  gpio2    gpio33  gpio46  gpio63  gpio73  gpio86
+gpio113  gpio20   gpio34  gpio47  gpio65  gpio74  gpio87
+gpio114  gpio22   gpio35  gpio48  gpio66  gpio75  gpio88
+gpio115  gpio23   gpio36  gpio49  gpio67  gpio76  gpio89
+gpio116  gpio26   gpio37  gpio5   gpio68  gpio77  gpio9
+```
+* gpio1_6 => 1 * 32 + 6 ==> gpio38
+* gpio0_27 => 0 * 32 + 27 ==> gpio27
+
+* cat /sys/kernel/debug/pinctrl/44e10800.pinmux/pins can show the register and value of all gpio pins
+```
+debian@beaglebone:/sys/kernel/debug/pinctrl/44e10800.pinmux$ cat pins | more
+registered pins: 142
+pin 0 (PIN0) 44e10800 00000031 pinctrl-single
+pin 1 (PIN1) 44e10804 00000031 pinctrl-single
+pin 2 (PIN2) 44e10808 00000031 pinctrl-single
+pin 3 (PIN3) 44e1080c 00000031 pinctrl-single
+pin 4 (PIN4) 44e10810 00000031 pinctrl-single
+pin 5 (PIN5) 44e10814 00000031 pinctrl-single
+pin 6 (PIN6) 44e10818 00000031 pinctrl-single
+pin 7 (PIN7) 44e1081c 00000031 pinctrl-single
+pin 8 (PIN8) 44e10820 00000027 pinctrl-single
+pin 9 (PIN9) 44e10824 00000027 pinctrl-single
+pin 10 (PIN10) 44e10828 00000027 pinctrl-single
+pin 11 (PIN11) 44e1082c 00000027 pinctrl-single
+pin 12 (PIN12) 44e10830 00000027 pinctrl-single
+pin 13 (PIN13) 44e10834 00000027 pinctrl-single
+pin 14 (PIN14) 44e10838 00000027 pinctrl-single
+pin 15 (PIN15) 44e1083c 00000027 pinctrl-single
+pin 16 (PIN16) 44e10840 00000027 pinctrl-single
+pin 17 (PIN17) 44e10844 00000027 pinctrl-single
+pin 18 (PIN18) 44e10848 00000027 pinctrl-single
+pin 19 (PIN19) 44e1084c 00000027 pinctrl-single
+pin 20 (PIN20) 44e10850 00000027 pinctrl-single
+pin 21 (PIN21) 44e10854 00000007 pinctrl-single
+
+3th column is the value of the resgister.
+0x00000031 => mode is 1
+0x00000027 => mode is 7
+```
+
+* DTB can change the pinmux value.
+```
+&am33xx_pinmux {
+	nxp_hdmi_bonelt_pins: nxp_hdmi_bonelt_pins {
+		pinctrl-single,pins = <
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA0, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA1, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA2, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA3, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA4, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA5, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA6, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA7, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA8, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA9, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA10, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA11, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA12, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA13, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA14, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_DATA15, PIN_OUTPUT, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_VSYNC, PIN_OUTPUT_PULLDOWN, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_HSYNC, PIN_OUTPUT_PULLDOWN, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_PCLK, PIN_OUTPUT_PULLDOWN, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_LCD_AC_BIAS_EN, PIN_OUTPUT_PULLDOWN, MUX_MODE0)
+		>;
+	};
+
+	mcasp0_pins: mcasp0_pins {
+		pinctrl-single,pins = <
+			AM33XX_PADCONF(AM335X_PIN_MCASP0_AHCLKX, PIN_INPUT_PULLUP, MUX_MODE0) /* mcasp0_ahcklx.mcasp0_ahclkx */
+			AM33XX_PADCONF(AM335X_PIN_MCASP0_AHCLKR, PIN_OUTPUT_PULLDOWN, MUX_MODE2) /* mcasp0_ahclkr.mcasp0_axr2*/
+			AM33XX_PADCONF(AM335X_PIN_MCASP0_FSX, PIN_OUTPUT_PULLUP, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_MCASP0_ACLKX, PIN_OUTPUT_PULLDOWN, MUX_MODE0)
+			AM33XX_PADCONF(AM335X_PIN_GPMC_A11, PIN_OUTPUT_PULLDOWN, MUX_MODE7) /* gpmc_a11.GPIO1_27 */
+		>;
+	};
+};
+
+```
+
+* cat /sys/kernel/debug/pinctrl/44e10800.pinmux/pinmux-pins show pinmux setting (ex. group name) of all pins
+```
+deian@beaglebone:/sys/kernel/debug/pinctrl/44e10800.pinmux$ cat pinmux-pins | more
+Pinmux settings per pin
+Format: pin (name): mux_owner gpio_owner hog?
+pin 0 (PIN0): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 1 (PIN1): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 2 (PIN2): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 3 (PIN3): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 4 (PIN4): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 5 (PIN5): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 6 (PIN6): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 7 (PIN7): 481d8000.mmc (GPIO UNCLAIMED) function pinmux_emmc_pins group pinm
+ux_emmc_pins
+pin 8 (PIN8): ocp:P8_19_pinmux (GPIO UNCLAIMED) function pinmux_P8_19_default_pi
+n group pinmux_P8_19_default_pin
+pin 9 (PIN9): ocp:P8_13_pinmux (GPIO UNCLAIMED) function pinmux_P8_13_default_pi
+n group pinmux_P8_13_default_pin
+```
+
+* cat /sys/kernel/debug/pinctrl/44e10800.pinmux/group show group name and related pins
+```
+debian@beaglebone:/sys/kernel/debug/pinctrl/44e10800.pinmux$ cat pingroups | more
+registered pin groups:
+group: pinmux_uart0_pins
+pin 92 (PIN92)
+pin 93 (PIN93)
+
+group: pinmux_P9_19_default_pin
+pin 95 (PIN95)
+
+group: pinmux_P9_19_gpio_pin
+pin 95 (PIN95)
+
+group: pinmux_P9_19_gpio_pu_pin
+pin 95 (PIN95)
+
+...
+
+group: pinmux_emmc_pins
+pin 32 (PIN32)
+pin 33 (PIN33)
+pin 0 (PIN0)
+pin 1 (PIN1)
+pin 2 (PIN2)
+pin 3 (PIN3)
+pin 4 (PIN4)
+pin 5 (PIN5)
+pin 6 (PIN6)
+pin 7 (PIN7)
+
+group: user_leds_s0
+pin 21 (PIN21)
+pin 22 (PIN22)
+pin 23 (PIN23)
+pin 24 (PIN24)
+```
+
+* cat /sys/kernel/debug/gpio show gpio pin setting
+```
+root@beaglebone:/sys/kernel/debug# cat gpio
+gpiochip0: GPIOs 0-31, parent: platform/44e07000.gpio, gpio:
+ gpio-0   (MDIO_DATA           )
+ gpio-1   (MDIO_CLK            )
+ gpio-2   (SPI0_SCLK           |P9_22               ) in  lo
+ gpio-3   (SPI0_D0             |P9_21               ) in  lo
+ gpio-4   (SPI0_D1             |P9_18               ) in  lo
+ gpio-5   (SPI0_CS0            |P9_17               ) in  lo
+ gpio-6   (SPI0_CS1            |cd                  ) in  hi IRQ
+ gpio-7   (ECAP0_IN_PWM0_OUT   |P9_42               ) in  lo
+ gpio-8   (LCD_DATA12          |P8_35               ) in  lo
+ gpio-9   (LCD_DATA13          |P8_33               ) in  lo
+ gpio-10  (LCD_DATA14          |P8_31               ) in  lo
+ gpio-11  (LCD_DATA15          |P8_32               ) in  lo
+ gpio-12  (UART1_CTSN          |P9_20               ) in  lo
+ gpio-13  (UART1_RTSN          |P9_19               ) in  lo
+ gpio-14  (UART1_RXD           |P9_26               ) in  lo
+ gpio-15  (UART1_TXD           |P9_24               ) in  lo
+ gpio-16  (GMII1_TXD3          )
+ gpio-17  (GMII1_TXD2          )
+ gpio-18  (USB0_DRVVBUS        )
+ gpio-19  (XDMA_EVENT_INTR0    )
+ gpio-20  (XDMA_EVENT_INTR1    |P9_41               ) in  lo
+ gpio-21  (GMII1_TXD1          )
+ gpio-22  (GPMC_AD8            |P8_19               ) in  lo
+ gpio-23  (GPMC_AD9            |P8_13               ) in  lo
+ gpio-24  (NC                  )
+ gpio-25  (NC                  )
+ gpio-26  (GPMC_AD10           |P8_14               ) in  lo
+ gpio-27  (GPMC_AD11           |P8_17               ) in  lo
+ gpio-28  (GMII1_TXD0          )
+ gpio-29  (RMII1_REFCLK        )
+ gpio-30  (GPMC_WAIT0          |P9_11               ) in  lo
+ gpio-31  (GPMC_WPN            |P9_13               ) in  lo
+
+gpiochip1: GPIOs 32-63, parent: platform/4804c000.gpio, gpio:
+ gpio-32  (GPMC_AD0            |P8_25               ) in  lo
+ gpio-33  (GPMC_AD1            |P8_24               ) in  lo
+ gpio-34  (GPMC_AD2            |P8_05               ) in  lo
+ gpio-35  (GPMC_AD3            |P8_06               ) in  lo
+ gpio-36  (GPMC_AD4            |P8_23               ) in  lo
+ gpio-37  (GPMC_AD5            |P8_22               ) in  lo
+ gpio-38  (GPMC_AD6            |P8_03               ) in  lo
+ gpio-39  (GPMC_AD7            |P8_04               ) in  lo
+```
+
+*Example. P9_22 (spi0_sclk, GPIO0_2)*
+
+* /sys/kernel/debug/gpio
+```
+ gpio-2   (SPI0_SCLK           |P9_22               ) in  lo
+```
+
+* /sys/kernel/debug/pinctrl/44e10800.pinmux/pins
+```
+pin 84 (PIN84) 44e10950 00000027 pinctrl-singl
+```
+
+0x00000027 ==> GPIO mode, Pull down, Input mode
+
+
+### Control the GPIO sysfs
+* Show all gpios
+```
+root@beaglebone:/sys/class/gpio# ls
+export   gpio114  gpio15  gpio3   gpio36  gpio46  gpio60  gpio68  gpio74  gpio80  gpiochip0
+gpio10   gpio115  gpio2   gpio30  gpio37  gpio47  gpio61  gpio69  gpio75  gpio81  gpiochip32
+gpio11   gpio116  gpio20  gpio31  gpio38  gpio48  gpio62  gpio7   gpio76  gpio86  gpiochip64
+gpio110  gpio117  gpio22  gpio32  gpio39  gpio49  gpio63  gpio70  gpio77  gpio87  gpiochip96
+gpio111  gpio12   gpio23  gpio33  gpio4   gpio5   gpio65  gpio71  gpio78  gpio88  unexport
+gpio112  gpio13   gpio26  gpio34  gpio44  gpio50  gpio66  gpio72  gpio79  gpio89
+gpio113  gpio14   gpio27  gpio35  gpio45  gpio51  gpio67  gpio73  gpio8   gpio
+```
+
+* Create a gpio
+```
+root@beaglebone:/sys/class/gpio# echo 85 > export
+root@beaglebone:/sys/class/gpio# ls gpio85
+active_low  device  direction  edge  label  power  subsystem  uevent  value
+```
+
+* Configre gpio
+```
+root@beaglebone:/sys/class/gpio/gpio46# ls
+active_low  device  direction  edge  label  power  subsystem  uevent  value
+root@beaglebone:/sys/class/gpio/gpio46# cat direction
+in
+root@beaglebone:/sys/class/gpio/gpio46# echo "out" > direction
+root@beaglebone:/sys/class/gpio/gpio46# cat direction
+out
+root@beaglebone:/sys/class/gpio/gpio46# echo 1 > value
+```
+
+## Beagalebon LED control
+* The BBB GPIOs can only source 6mA to 8mA of current when in OUTPUT mode. So, if for example, the LED max forward current is 20mA, then need not to use any current limiting resistor.
+
+* The LED sysfs
+```
+root@beaglebone:/sys/class/leds# ls
+beaglebone:green:usr0  beaglebone:green:usr1  beaglebone:green:usr2  beaglebone:green:usr3
+```
+
+* Control the LED
+```
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3# ls
+brightness  device  max_brightness  power  subsystem  trigger  uevent
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3# echo "default-on" > trigger
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3# echo "timer" > trigger
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3# ecoh 1 > brightness
+bash: ecoh: command not found
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3# echo 0 > brightness
+root@beaglebone:/sys/class/leds/beaglebone:green:usr3#
+```
+
+### Use C code to control LED
+```
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#define SYS_FS_LEDS_PATH    "/sys/class/leds"
+#define USR_LED_NUMBER      3
+#define SOME_BYTES          100
+
+int write_trigger_values(uint8_t led_no, char *value)
+{
+    int fd, ret = 0;
+    char buf[SOME_BYTES];
+
+    snprintf(buf, sizeof(buf), SYS_FS_LEDS_PATH "/beaglebone:green:usr%d/trigger", led_no);
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0) {
+        perror("write trigger error\n");
+        return -1;
+    }
+
+    ret = write(fd, value, strlen(value));
+    if (ret <= 0) {
+        printf("trigger value write error (%s)\n", buf);
+        return -1;
+    }
+    return 0;
+}
+
+int write_brightness_values(uint8_t led_no, char *value)
+{
+    int fd, ret = 0;
+    char buf[SOME_BYTES];
+
+    snprintf(buf, sizeof(buf), SYS_FS_LEDS_PATH "/beaglebone:green:usr%d/brightness", led_no);
+
+    fd = open(buf, O_WRONLY);
+    if (fd < 0) {
+        perror("write brightness error\n");
+        return -1;
+    }
+
+    ret = write(fd, value, strlen(value));
+    if (ret <= 0) {
+        printf("brightness value write error (%s)\n", buf);
+        return -1;
+    }
+    return 0;
+}
+
+void process_trigger_values(char *value)
+{
+    if(strcmp(value, "timer") || strcmp(value, "heartbeat") || \
+            strcmp(value, "none") || strcmp(value, "oneshot") || \
+            strcmp(value, "default-on")) {
+        write_trigger_values(USR_LED_NUMBER, value);
+    } else {
+        printf("Invalid value\n");
+        printf("valid trigger values: heartbeat, timer, none, oneshot, default-on\n");
+    }
+}
+
+void process_brightness_values(int value)
+{
+    switch (value) {
+        case 1:
+            write_brightness_values(USR_LED_NUMBER, "1");
+            break;
+        case 0:
+            write_brightness_values(USR_LED_NUMBER, "0");
+            break;
+        default:
+            printf("Invalid value\n");
+            printf("valid brightness value: 0, 1\n");
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    printf("This application controls the UER LED3\n");
+
+    if (argc != 3) {
+        printf("usage: %s <control_option> <value>\n", argv[0]);
+        printf("valid control_options : brightness, trigger\n");
+        printf("valid 'brightness' value: 0, 1\n");
+        printf("valid 'trigger' values: heartbeat, timer, none, oneshot, deafault-on\n");
+    } else {
+        if (strcmp(argv[1], "trigger") == 0) {
+            process_trigger_values(argv[2]);
+        } else if (strcmp(argv[1], "brightness") == 0) {
+            int value = atoi(argv[2]);
+            process_brightness_values(value);
+        } else {
+            printf("Invalid control option\n");
+            printf("valid control_options : brightness, trigger\n");
+        }
+    }
+
+    return 0;
+}
+```
+
+## AM335x I2C
+* AM335x includes three instantiations of the I2C module.
+* This peripheral implements the multi-master I2C bus which allow serial transfer of 8-bit data to/from other I2C master/slave devices through a two-wrie interface.
+![am335x_i2c](imgs/am335x_i2c.png)
+
+![i2c_operation](imgs/i2c_opeation.png)
