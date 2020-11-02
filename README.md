@@ -258,11 +258,33 @@ Starting kernel ...
 
 ---
 ### U-boot command
-1. Load the uImage from Memory device (SD card/eMMC) into the DDR memory of the board
-2. Use the memory dump comand of u-boot to dump header information
+Command|Description
+---|---
+bdinfo|Show board information
+md [.b w l] address [# of objects]|Memory display, [.b .w .l] means 1byte, 2bytes, 4bytes, respectively, ex. `md.b 0x80000000 10`, Display 16bytes data
+nm [.b w l] address|Memory modify (constant address), ex. `nm.l 0x80000000`, enter q to exit
+mm [.b, .w, .l] address|memory modify (auto-incrementing address)
+mw [.b, .w, .l] address value [count]|memory write (fill), copy value to assigned memory space
+cp [.b, .w, .l] source target count|memory copy
+cmp [.b, .w, .l] addr1 addr2 count|memory compare
+tftpboot [loadAddress] [[hostIPaddr:]bootfilename]|boot image via network using TFTP protocol
+mmc info|display info of the current MMC device
+mmc rescan|Rescan mmc devices
+mmc list|lists available devices
+mmc dev [dev] [part]|show or set current mmc device [partition], dev: MMC id, part: Partition number, ex. `mmc dev 0` switch to SD, `mmc dev 1` switch to eMMC
+mmc part|lists available partition on current mmc device
+mmc read addr blk# cnt|Read cnt blocks(512B) from mmc's blk to DRAM addr
+mmc write addr blk# cnt| Write cnt blocks(512B) from DRAM addr to mmc's blk
+fatinfo <interface> [<dev[:part]>]|print information about filesystem from 'dev' on 'interface', ex. `fatinfo mmc 0:1`
+fatls <interface> [<dev[:part]>] [directory]|list files from 'dev' on 'interface' in a 'directory', ex. `fatls mmc 0:1`
+fstype <interface> <dev>:<part>|print filesystem type
+fatload <interface> [<dev[:part]> [<addr> [<filename> [bytes [pos]]]]]|Load binary file 'filename' from 'dev' on 'interface' to address 'addr' from dos filesystem., ex. `fatload mmc 0:1 0x82000000 uImage`
+fatwrite <interface> <dev[:part]> <addr> <filename> [<bytes>]|write file 'filename' from the address 'addr' in RAM to 'dev' on 'interface', ex. `fatwrite mmc 0:1 0x82000000 uImage 0x50000`
+ext4ls <interface> <dev[:part]> [directory]|list files from 'dev' on 'interface' in a 'directory'
 
-* To load a file from FAT based file system into memory use: fatload
-* To load a file from any file system: load
+
+* To load a file from FAT based file system into memory use: `fatload`
+* To load a file from any file system: `load`
 
 ```
 Example:
